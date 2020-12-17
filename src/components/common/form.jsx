@@ -21,7 +21,7 @@ class Form extends Component {
   validateProperty = ({ name, value }) => {
     const obj = { [name]: value };
     const schema = { [name]: this.schema[name] };
-    const { error } = Joi.validate(obj, schema); 
+    const { error } = Joi.validate(obj, schema);
     return error ? error.details[0].message : null;
   };
 
@@ -47,7 +47,7 @@ class Form extends Component {
     this.setState({ data, errors });
   };
 
-  renderButton(label) { //label= Signup
+  renderButton(label) {
     return (
       <button disabled={this.validate()} className="btn btn-primary">
         {label}
