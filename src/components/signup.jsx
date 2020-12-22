@@ -4,6 +4,9 @@ import Joi from "joi-browser";
 import Form from "./common/form";
 import http from "../services/httpService";
 import { apiUrl } from "../config.json";
+import { toast } from 'react-toastify';
+import userService from "..//services/userService";
+import { Redirect } from "react-router-dom";
 
 class Signup extends Form {
   state = {
@@ -26,7 +29,12 @@ doSubmit = async () => {
   try {
 
     await http.post(`${ apiUrl }/users`, data); //resolves the button bug by typing an existing email
-    this.props.history.replace('/');
+    toast.success(`${data.name}, You registered successfully!`, {
+      position: 'top-center',
+      autoClose: 5000
+    });
+
+    this.props.history.replace('/signin');
 
   } catch( ex ){
 
@@ -40,6 +48,9 @@ doSubmit = async () => {
 }
 
   render() {
+
+    if( userService.getCurrentUser() ) return <Redirect to="/" />
+
     return (
       <div className="container">
         <PageHeader titleText="Signup for Real App" />
