@@ -3,11 +3,10 @@ import PageHeader from "./common/pageHeader";
 import Joi from "joi-browser";
 import Form from "./common/form";
 import cardService from "../services/cardService";
-// import { data } from 'jquery';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link} from "react-router-dom";
-class CreateCard extends Form {
+class EditCard extends Form {
 
     state = { 
         data: {  
@@ -21,6 +20,7 @@ class CreateCard extends Form {
       }
 
   schema = {
+      _id: Joi.string(),
     bizName: Joi.string().min(2).max(255).required(),
     bizDescription: Joi.string().min(2).max(1024).required(),
     bizAddress: Joi.string().min(2).max(400).required(),
@@ -28,23 +28,38 @@ class CreateCard extends Form {
     bizImage: Joi.string().min(11).max(1024).uri().allow("")
   }
 
-  doSubmit = async () => {
+  async componentDidMount() {
+      const cardId = this.props.match.params.id;
+      const { data } = await cardService.getCard(cardId);
+      this.setState({ data:this.mapToViewModel(data) });
+  }
 
-    const data = { ...this.state.data };
-    if( ! data.bizImage ) delete data.bizImage;
-    await cardService.createCard(data);
-    toast("Your card has been created successfully");
-    this.props.history.replace('/my-cards');
+  mapToViewModel(card){
+      return {
+          _id: card.id,
+          bizName: card.bizName,
+          bizDescription: card.bizDescription,
+          bizAddress: card.bizAddress,
+          bizPhone: card.bizPhone,
+          bizImage: card.bizImage
+      };
+  }
+
+  doSubmit = async () => {
+    const { data } = this.state;
+    await cardService.editCard(data);
+    toast("Card details is Updated");
+    this.props.history.replace("/my-cards");
   }
 
   render() { 
 
     return ( 
       <div className="container">
-        <PageHeader titleText="Create Card Form" />
+        <PageHeader titleText="Edit Card Form" />
       <div className="row">
         <div className="col-12">
-          <p>Fill your business card details here</p>
+          <p>Update your business card details here.</p>
         </div>
       </div>
       <div className="row">
@@ -55,7 +70,7 @@ class CreateCard extends Form {
             { this.renderInput("bizAddress", "Bussiness Adress") }
             { this.renderInput("bizPhone", "Bussiness Phone") }
             { this.renderInput("bizImage", "Bussiness Imaje") }
-            { this.renderButton("Create Card") }
+            { this.renderButton("Update Card") }
             <Link className="btn btn-secondary ml-2" to="/my-cards">Cansel</Link>
           </form>
         </div>
@@ -65,4 +80,4 @@ class CreateCard extends Form {
   }
 }
  
-export default CreateCard;
+export default EditCard;
